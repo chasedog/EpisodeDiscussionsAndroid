@@ -1,16 +1,21 @@
 package com.thechasedog.episodediscussions.models;
 
 import java.util.List;
+/*
 
-import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+import io.realm.RealmList;
+*/
 
-public class Subreddit extends RealmObject {
-    @PrimaryKey
+public class Subreddit {//} extends RealmObject {
+//    @PrimaryKey
     public int Id;
     public String Name;
-    public RealmList<Post> Posts;
+    public List<Season> seasons;
+
+    public Subreddit() {
+    }
 
     public Subreddit(String name) {
         setName(name);
@@ -24,11 +29,11 @@ public class Subreddit extends RealmObject {
         Name = name;
     }
 
-    public List<Post> getPosts() {
-        return Posts;
+    public List<Season> getSeasons() {
+        return seasons;
     }
 
-    public void setPosts(RealmList<Post> posts) {
-        Posts = posts;
+    public void setSeasons(List<Season> seasons) {
+        this.seasons = seasons;
     }
 }

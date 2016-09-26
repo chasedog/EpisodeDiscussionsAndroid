@@ -7,16 +7,23 @@
    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                  android:orientation="horizontal"
                  android:layout_width="match_parent"
-                 android:layout_height="match_parent">
+                 android:layout_height="wrap_content">
 
       <TextView
-        android:layout_width="61dp"
-        android:layout_height="50dp"
-        android:text="@{post.getUps()}"/>
-
-      <TextView
-        android:text="@{post.getTitle()}"
+        android:id="@+id/text_ups"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"/>
+        android:minWidth="100dp"
+        android:minHeight="50dp"
+        android:textAppearance="?android:attr/textAppearanceListItem"
+        android:text="@{post.getUps()}"
+        android:layout_height="wrap_content" />
+
+      <TextView
+        android:id="@+id/text_title"
+        android:textAppearance="?android:attr/textAppearanceListItem"
+        android:text="@{post.getTitle()}"
+        android:layout_width="match_parent"
+        android:minHeight="50dp"
+        android:layout_height="wrap_content" />
    </LinearLayout>
 </layout>

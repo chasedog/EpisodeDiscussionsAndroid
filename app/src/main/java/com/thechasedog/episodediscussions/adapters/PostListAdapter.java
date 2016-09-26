@@ -2,49 +2,41 @@ package com.thechasedog.episodediscussions.adapters;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
-import com.thechasedog.episodediscussions.BR;
 import com.thechasedog.episodediscussions.R;
 
 import java.util.List;
 
 import com.thechasedog.episodediscussions.databinding.PostViewBinding;
-import com.thechasedog.episodediscussions.viewmodels.PostViewModel;
+import com.thechasedog.episodediscussions.models.Episode;
 
-public class PostListAdapter extends ArrayAdapter<PostViewModel> {
-    public PostListAdapter(Context context, int resource, int textViewResourceId) {
-        super(context, resource, textViewResourceId);
+public class PostListAdapter extends RecyclerView.Adapter<BindingHolder> {
+    private Context context;
+    private final List<Episode> mEpisodes;
+
+    public PostListAdapter(Context context, List<Episode> episodes) {
+        this.context = context;
+        mEpisodes = episodes;
     }
 
-    public PostListAdapter(Context context, int resource, List<PostViewModel> objects) {
-        super(context, resource, objects);
-    }
-
-    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.post_view, null);
-        if (convertView == null) {
+    public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+        PostViewBinding binding = DataBindingUtil.inflate(layoutInflater, R.layout.post_view, parent, false);
+        return new BindingHolder(binding);
+    }
 
-        }
+    @Override
+    public void onBindViewHolder(BindingHolder holder, int position) {
+         Episode episode = mEpisodes.get(position);
+        holder.bindPost(episode);
+    }
 
-        PostViewModel post = getItem(position);
-
-        if (post != null) {
-            ViewDataBinding binding = DataBindingUtil.inflate(inflater, R.layout.post_view, parent, false);
-            binding.setVariable(BR.post, post);
-            binding.executePendingBindings();
-        }
-
-        return convertView;
+    @Override
+    public int getItemCount() {
+        return mEpisodes.size();
     }
 }

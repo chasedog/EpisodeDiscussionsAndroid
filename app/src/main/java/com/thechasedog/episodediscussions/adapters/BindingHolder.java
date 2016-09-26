@@ -1,21 +1,32 @@
 package com.thechasedog.episodediscussions.adapters;
 
-import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
+
+import com.thechasedog.episodediscussions.databinding.PostViewBinding;
+import com.thechasedog.episodediscussions.models.Episode;
+import com.thechasedog.episodediscussions.viewmodels.PostViewModel;
 
 /**
  * Created by Chase Dog on 9/24/2016.
  */
 public class BindingHolder extends RecyclerView.ViewHolder {
-    private ViewDataBinding binding;
+    private final PostViewBinding mBinding;
+    private final PostViewModel mPostViewModel;
 
-    public BindingHolder(View rowView) {
-        super(rowView);
-        binding = DataBindingUtil.bind(rowView);
+    public BindingHolder(PostViewBinding binding) {
+        super(binding.getRoot());
+        mPostViewModel = new PostViewModel();
+        binding.setPost(mPostViewModel);
+        mBinding = binding;
     }
+
     public ViewDataBinding getBinding() {
-        return binding;
+        return mBinding;
+    }
+
+    public void bindPost(Episode episode) {
+        mPostViewModel.setPost(episode);
+        mBinding.executePendingBindings();
     }
 }

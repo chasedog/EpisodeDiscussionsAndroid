@@ -1,10 +1,10 @@
 package com.thechasedog.episodediscussions.models;
-
+/*
 import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.PrimaryKey;*/
 
-public class Post extends RealmObject {
-    @PrimaryKey
+public class Episode {// extends RealmObject {
+    //@PrimaryKey
     public int Id;
     public String PostId;
     public String Title;
@@ -12,7 +12,10 @@ public class Post extends RealmObject {
     public int Ups;
     public String Subreddit;
 
-    public Post(String title, int ups) {
+    public Episode() {
+    }
+
+    public Episode(String title, int ups) {
         Title = title;
         Ups = ups;
     }

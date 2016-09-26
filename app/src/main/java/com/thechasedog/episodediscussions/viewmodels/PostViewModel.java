@@ -1,19 +1,29 @@
 package com.thechasedog.episodediscussions.viewmodels;
 
-import com.thechasedog.episodediscussions.models.Post;
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 
-public class PostViewModel {
-    public Post Post;
+import com.thechasedog.episodediscussions.models.Episode;
 
-    public PostViewModel(Post post) {
-        Post = post;
+public class PostViewModel extends BaseObservable{
+    public Episode mEpisode;
+
+    public PostViewModel() {
+
     }
 
+    @Bindable
     public String getUps() {
-        return Integer.toString(Post.getUps());
+        return Integer.toString(mEpisode.getUps());
     }
 
+    @Bindable
     public String getTitle() {
-        return Post.getTitle();
+        return mEpisode.getTitle();
+    }
+
+    public void setPost(Episode episode) {
+        mEpisode = episode;
+        notifyChange();
     }
 }
