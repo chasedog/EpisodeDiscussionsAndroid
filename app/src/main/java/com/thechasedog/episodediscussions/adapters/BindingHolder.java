@@ -1,5 +1,7 @@
 package com.thechasedog.episodediscussions.adapters;
 
+import android.app.Activity;
+import android.content.Context;
 import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;
 
@@ -14,9 +16,9 @@ public class BindingHolder extends RecyclerView.ViewHolder {
     private final PostViewBinding mBinding;
     private final PostViewModel mPostViewModel;
 
-    public BindingHolder(PostViewBinding binding) {
+    public BindingHolder(Activity context, PostViewBinding binding) {
         super(binding.getRoot());
-        mPostViewModel = new PostViewModel();
+        mPostViewModel = new PostViewModel(context);
         binding.setPost(mPostViewModel);
         mBinding = binding;
     }

@@ -1,5 +1,6 @@
 package com.thechasedog.episodediscussions.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,4 +11,8 @@ public class Season {
     public int SeasonNumber;
     public boolean IsRewatch;
     public List<Episode> Episodes;
+
+    public Season() {
+        Episodes = new ArrayList<>();
+    }
 }

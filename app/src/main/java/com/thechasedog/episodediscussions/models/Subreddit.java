@@ -1,5 +1,6 @@
 package com.thechasedog.episodediscussions.models;
 
+import java.util.ArrayList;
 import java.util.List;
 /*
 
@@ -15,6 +16,7 @@ public class Subreddit {//} extends RealmObject {
     public List<Season> seasons;
 
     public Subreddit() {
+        seasons = new ArrayList<>();
     }
 
     public Subreddit(String name) {

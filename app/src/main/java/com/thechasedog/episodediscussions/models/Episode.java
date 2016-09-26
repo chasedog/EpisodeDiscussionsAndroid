@@ -11,6 +11,7 @@ public class Episode {// extends RealmObject {
     public String URL;
     public int Ups;
     public String Subreddit;
+    public int EpisodeNumber;
 
     public Episode() {
     }
@@ -50,5 +51,9 @@ public class Episode {// extends RealmObject {
 
     public void setSubreddit(String subreddit) {
         Subreddit = subreddit;
+    }
+
+    public int getEpisodeNumber() {
+        return EpisodeNumber;
     }
 }

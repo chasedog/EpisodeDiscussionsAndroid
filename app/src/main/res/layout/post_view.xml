@@ -1,29 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-   <data>
-      <variable name="post" type="com.thechasedog.episodediscussions.viewmodels.PostViewModel"/>
-   </data>
+<layout xmlns:tools="http://schemas.android.com/tools">
 
-   <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                 android:orientation="horizontal"
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content">
+  <data>
+    <variable
+      name="post"
+      type="com.thechasedog.episodediscussions.viewmodels.PostViewModel"/>
+  </data>
 
-      <TextView
-        android:id="@+id/text_ups"
-        android:layout_width="wrap_content"
-        android:minWidth="100dp"
-        android:minHeight="50dp"
-        android:textAppearance="?android:attr/textAppearanceListItem"
-        android:text="@{post.getUps()}"
-        android:layout_height="wrap_content" />
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginBottom="1dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="@{() -> post.onClick()}">
+
+    <TextView
+      android:id="@+id/text_ups"
+      android:layout_width="wrap_content"
+      android:minWidth="50dp"
+      android:textAppearance="?android:attr/textAppearanceListItem"
+      android:text="@{post.getEpisodeNumber()}"
+      android:layout_height="match_parent"
+      tools:text="2011" />
+
+    <LinearLayout
+      android:orientation="vertical"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
 
       <TextView
         android:id="@+id/text_title"
-        android:textAppearance="?android:attr/textAppearanceListItem"
         android:text="@{post.getTitle()}"
         android:layout_width="match_parent"
-        android:minHeight="50dp"
-        android:layout_height="wrap_content" />
-   </LinearLayout>
+        android:layout_height="wrap_content"
+        tools:text='Ray Donovan 1x06 "Housewarming - Episode Discussion'
+        android:fontFamily="sans-serif"
+        android:textColor="?attr/colorPrimaryDark"
+        android:textAlignment="viewStart"/>
+      <TextView
+        android:text="7 hours ago"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="1"/>
+      <RelativeLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+          android:text="129 upvotes"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:maxLines="1"/>
+
+        <TextView
+          android:text="2888 comments"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentTop="true"
+          android:layout_alignParentEnd="true"
+          android:maxLines="1"/>
+      </RelativeLayout>
+    </LinearLayout>
+  </LinearLayout>
 </layout>

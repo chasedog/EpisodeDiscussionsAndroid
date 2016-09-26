@@ -1,10 +1,12 @@
 package com.thechasedog.episodediscussions.activities;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,15 +20,25 @@ import android.view.MenuItem;
 import com.thechasedog.episodediscussions.R;
 import com.thechasedog.episodediscussions.adapters.PostListAdapter;
 import com.thechasedog.episodediscussions.models.Episode;
+import com.thechasedog.episodediscussions.models.Season;
+import com.thechasedog.episodediscussions.models.Subreddit;
+import com.thechasedog.episodediscussions.services.DiscussionApi;
+import com.thechasedog.episodediscussions.services.DiscussionService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AsyncResponse<Subreddit> {
 
     PostListAdapter mPostListAdapter;
     RecyclerView mPostRecyclerView;
+    private final List<Episode> mEpisodes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,17 +67,36 @@ public class HomeActivity extends AppCompatActivity
 
         mPostRecyclerView = (RecyclerView) findViewById(R.id.list_posts);
 
-        List<Episode> episodes = new ArrayList<>();
-        episodes.add(new Episode("Hey what's up dude how's it going wow", 2001));
-        episodes.add(new Episode("Hey what's up dude how's it goinsadfasdfasdfsadfsadfg wow", 10));
-        episodes.add(new Episode("Hey what'sasdf up dude how'ssadfasdf it going wow", 233));
-        episodes.add(new Episode("Hey what's upasdf dude how's it going wow", 2));
-        episodes.add(new Episode("Hey what's up asdfdude hasdfow's it going wow", 0));
+        new MyAsyncTask<Void, Void, Subreddit>(this) {
 
-        mPostListAdapter = new PostListAdapter(this, episodes);
+            @Override
+            protected Subreddit doInBackground(Void... voids) {
+                Subreddit subreddit = null;
+
+                try {
+                    subreddit = DiscussionService.getSubreddit("raydonovan");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return subreddit;
+            }
+        }.execute();
+
+        mPostListAdapter = new PostListAdapter(this, mEpisodes);
 
         mPostRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mPostRecyclerView.setAdapter(mPostListAdapter);
+    }
+
+
+    @Override
+    public void processFinish(Subreddit result) {
+        for (Season season : result.seasons) {
+            for (Episode episode : season.Episodes) {
+                Log.d("HomeActivity.Episode", episode.getTitle() + ", " + episode.URL);
+                mEpisodes.add(episode);
+            }
+        }
         mPostListAdapter.notifyDataSetChanged();
     }
 

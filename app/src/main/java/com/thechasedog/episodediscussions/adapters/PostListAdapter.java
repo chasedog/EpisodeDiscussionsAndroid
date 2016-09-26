@@ -1,5 +1,6 @@
 package com.thechasedog.episodediscussions.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
@@ -14,10 +15,10 @@ import com.thechasedog.episodediscussions.databinding.PostViewBinding;
 import com.thechasedog.episodediscussions.models.Episode;
 
 public class PostListAdapter extends RecyclerView.Adapter<BindingHolder> {
-    private Context context;
+    private Activity context;
     private final List<Episode> mEpisodes;
 
-    public PostListAdapter(Context context, List<Episode> episodes) {
+    public PostListAdapter(Activity context, List<Episode> episodes) {
         this.context = context;
         mEpisodes = episodes;
     }
@@ -26,7 +27,7 @@ public class PostListAdapter extends RecyclerView.Adapter<BindingHolder> {
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         PostViewBinding binding = DataBindingUtil.inflate(layoutInflater, R.layout.post_view, parent, false);
-        return new BindingHolder(binding);
+        return new BindingHolder(context, binding);
     }
 
     @Override
