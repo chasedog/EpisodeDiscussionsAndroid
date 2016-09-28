@@ -1,12 +1,16 @@
 package com.thechasedog.episodediscussions.activities;
 
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -34,7 +38,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AsyncResponse<Subreddit> {
+        implements NavigationView.OnNavigationItemSelectedListener, AsyncResponse<Subreddit>, SubredditChooseFragment.NoticeDialogListener {
 
     PostListAdapter mPostListAdapter;
     RecyclerView mPostRecyclerView;
@@ -51,8 +55,7 @@ public class HomeActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                showSubredditChooser();
             }
         });
 
@@ -67,20 +70,7 @@ public class HomeActivity extends AppCompatActivity
 
         mPostRecyclerView = (RecyclerView) findViewById(R.id.list_posts);
 
-        new MyAsyncTask<Void, Void, Subreddit>(this) {
-
-            @Override
-            protected Subreddit doInBackground(Void... voids) {
-                Subreddit subreddit = null;
-
-                try {
-                    subreddit = DiscussionService.getSubreddit("raydonovan");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return subreddit;
-            }
-        }.execute();
+        //GetDataForSubreddit();
 
         mPostListAdapter = new PostListAdapter(this, mEpisodes);
 
@@ -88,6 +78,25 @@ public class HomeActivity extends AppCompatActivity
         mPostRecyclerView.setAdapter(mPostListAdapter);
     }
 
+    private void GetDataForSubreddit(String subreddit) {
+        new MyAsyncTask<String, Void, Subreddit>(this) {
+            @Override
+            protected Subreddit doInBackground(String... params) {
+                Subreddit subreddit = null;
+
+                try {
+                    subreddit = DiscussionService.getSubreddit(params[0]);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return subreddit;
+            }
+        }.execute(subreddit);
+    }
+
+    public void showSubredditChooser() {
+        new SubredditChooseFragment().show(getSupportFragmentManager(), "subreddit");
+    }
 
     @Override
     public void processFinish(Subreddit result) {
@@ -155,5 +164,15 @@ public class HomeActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onDialogPositiveClick(String subreddit) {
+        GetDataForSubreddit(subreddit);
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
     }
 }
