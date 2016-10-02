@@ -1,16 +1,11 @@
 package com.thechasedog.episodediscussions.activities;
 
-import android.content.DialogInterface;
-import android.os.AsyncTask;
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,26 +17,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.thechasedog.episodediscussions.R;
-import com.thechasedog.episodediscussions.adapters.PostListAdapter;
+import com.thechasedog.episodediscussions.Util.Device;
 import com.thechasedog.episodediscussions.models.Episode;
 import com.thechasedog.episodediscussions.models.Season;
 import com.thechasedog.episodediscussions.models.Subreddit;
-import com.thechasedog.episodediscussions.services.DiscussionApi;
 import com.thechasedog.episodediscussions.services.DiscussionService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import retrofit2.Call;
-import retrofit2.Response;
+import static android.content.Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AsyncResponse<Subreddit>, SubredditChooseFragment.NoticeDialogListener {
-
-    PostListAdapter mPostListAdapter;
-    RecyclerView mPostRecyclerView;
+        implements NavigationView.OnNavigationItemSelectedListener, AsyncResponse<Subreddit>, SubredditChooseFragment.NoticeDialogListener, EpisodeFragment.OnListFragmentInteractionListener<Episode> {
+    EpisodeFragment episodeFragment;
     private final List<Episode> mEpisodes = new ArrayList<>();
 
     @Override
@@ -68,14 +59,10 @@ public class HomeActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mPostRecyclerView = (RecyclerView) findViewById(R.id.list_posts);
-
-        //GetDataForSubreddit();
-
-        mPostListAdapter = new PostListAdapter(this, mEpisodes);
-
-        mPostRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mPostRecyclerView.setAdapter(mPostListAdapter);
+        if (findViewById(R.id.fragment_container) != null) {
+            episodeFragment = new EpisodeFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, episodeFragment).commit();
+        }
     }
 
     private void GetDataForSubreddit(String subreddit) {
@@ -102,11 +89,11 @@ public class HomeActivity extends AppCompatActivity
     public void processFinish(Subreddit result) {
         for (Season season : result.seasons) {
             for (Episode episode : season.Episodes) {
-                Log.d("HomeActivity.Episode", episode.getTitle() + ", " + episode.URL);
+//                Log.d("HomeActivity.Episode", episode.getTitle() + ", " + episode.URL);
                 mEpisodes.add(episode);
             }
         }
-        mPostListAdapter.notifyDataSetChanged();
+        episodeFragment.refreshData();
     }
 
     @Override
@@ -174,5 +161,36 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
 
+    }
+
+    @Override
+    public void onClick(Episode item) {
+        Intent intent = getIntentForURL(item.getURL());
+        startActivity(intent);
+    }
+
+    @Override
+    public List<Episode> getData() {
+        return mEpisodes;
+    }
+
+    private Intent getIntentForURL(String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        addFlagsForMultiWindowDevices(intent);
+        return intent;
+    }
+
+    private void addFlagsForMultiWindowDevices(Intent intent) {
+        if (Device.hasNougatOrGreater()) {
+            intent.addFlags(getFlagsIfInMultiwindow());
+        }
+    }
+
+    @TargetApi(24)
+    private int getFlagsIfInMultiwindow() {
+        if (isInMultiWindowMode()) {
+            return FLAG_ACTIVITY_LAUNCH_ADJACENT | FLAG_ACTIVITY_NEW_TASK;
+        }
+        return 0;
     }
 }

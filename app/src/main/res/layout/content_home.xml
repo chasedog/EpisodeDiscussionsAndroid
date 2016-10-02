@@ -13,9 +13,8 @@
   tools:showIn="@layout/app_bar_home"
   tools:context=".activities.HomeActivity">
 
-  <android.support.v7.widget.RecyclerView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/list_posts"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+  <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+       android:id="@+id/fragment_container"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent" />
 </RelativeLayout>
