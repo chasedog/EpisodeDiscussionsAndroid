@@ -9,6 +9,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.thechasedog.episodediscussions.R;
@@ -21,7 +22,7 @@ public class SubredditChooseFragment extends DialogFragment {
     private Context mContext;
 
     public interface NoticeDialogListener {
-        void onDialogPositiveClick(String result);
+        void onDialogPositiveClick(SubredditChooserResponse result);
         void onDialogNegativeClick(DialogFragment dialog);
     }
 
@@ -45,11 +46,13 @@ public class SubredditChooseFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         View view = View.inflate(mContext, R.layout.dialog_enter_subreddit, null);
         final EditText subreddit = (EditText)view.findViewById(R.id.edit_text_subreddit);
+        final CheckBox saveToDrawer = (CheckBox) view.findViewById(R.id.checkbox_save_to_drawer);
         builder.setView(view)
                 .setPositiveButton("View", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogPositiveClick(subreddit.getText().toString());
+                        SubredditChooserResponse result = new SubredditChooserResponse(subreddit.getText().toString(), saveToDrawer.isChecked());
+                        mListener.onDialogPositiveClick(result);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

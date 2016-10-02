@@ -28,4 +28,13 @@
     android:layout_alignBottom="@+id/textView2"
     android:layout_toEndOf="@+id/textView2"
     android:layout_marginStart="23dp"/>
+
+  <CheckBox
+    android:text="Save to drawer"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/edit_text_subreddit"
+    android:layout_alignStart="@+id/textView2"
+    android:id="@+id/checkbox_save_to_drawer"
+    android:checked="true"/>
 </RelativeLayout>
