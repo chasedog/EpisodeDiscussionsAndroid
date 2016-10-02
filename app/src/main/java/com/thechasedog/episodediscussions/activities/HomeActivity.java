@@ -34,6 +34,7 @@ public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AsyncResponse<Subreddit>, SubredditChooseFragment.NoticeDialogListener, EpisodeFragment.OnListFragmentInteractionListener<Episode> {
     EpisodeFragment episodeFragment;
     private final List<Episode> mEpisodes = new ArrayList<>();
+    private Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,13 @@ public class HomeActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        mMenu = navigationView.getMenu();
+        mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "Southpark");
+        mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "Shameless");
+        mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "BrooklynNineNine");
+        mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "IASIP");
+        mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "HTGAWM");
+        mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "lastmanonearthtv");
         navigationView.setNavigationItemSelectedListener(this);
 
         if (findViewById(R.id.fragment_container) != null) {
@@ -87,6 +95,7 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void processFinish(Subreddit result) {
+        mEpisodes.clear();
         for (Season season : result.seasons) {
             for (Episode episode : season.Episodes) {
 //                Log.d("HomeActivity.Episode", episode.getTitle() + ", " + episode.URL);
@@ -94,6 +103,7 @@ public class HomeActivity extends AppCompatActivity
             }
         }
         episodeFragment.refreshData();
+        setTitle("/r/" + result.getName());
     }
 
     @Override
@@ -132,30 +142,23 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
+        String subreddit = item.getTitle().toString();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+
+        GetDataForSubreddit(subreddit);
+
         return true;
     }
 
     @Override
-    public void onDialogPositiveClick(String subreddit) {
-        GetDataForSubreddit(subreddit);
+    public void onDialogPositiveClick(SubredditChooserResponse response) {
+        GetDataForSubreddit(response.subreddit);
+
+        if (response.saveToDrawer) {
+            mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, response.subreddit);
+        }
     }
 
     @Override
