@@ -6,13 +6,16 @@
      android:checkableBehavior="single">
    </group>
 
-<!--   <item android:title="Settings">
+   <item android:title="Settings">
       <menu>
          <item
-           android:id="@+id/settings"
+           android:id="@+id/revoke_oauth"
+           android:title="Revoke token"/>
+         <item
+           android:id="@+id/login_to_reddit"
            android:icon="@drawable/ic_menu_manage"
-           android:title="Settings"/>
+           android:title="Log in to reddit"/>
       </menu>
-   </item>-->
+   </item>
 
 </menu>

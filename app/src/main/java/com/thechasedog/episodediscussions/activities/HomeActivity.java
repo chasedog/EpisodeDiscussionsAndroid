@@ -15,13 +15,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.thechasedog.episodediscussions.App;
 import com.thechasedog.episodediscussions.R;
 import com.thechasedog.episodediscussions.Util.Device;
 import com.thechasedog.episodediscussions.models.Episode;
 import com.thechasedog.episodediscussions.models.Season;
 import com.thechasedog.episodediscussions.models.Subreddit;
 import com.thechasedog.episodediscussions.services.DiscussionService;
+
+import net.dean.jraw.http.oauth.OAuthHelper;
+import net.dean.jraw.models.Listing;
+import net.dean.jraw.paginators.UserSubredditsPaginator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,6 +43,14 @@ public class HomeActivity extends AppCompatActivity
     private final List<Episode> mEpisodes = new ArrayList<>();
     private Menu mMenu;
 
+    private AsyncResponse<List<String>> mSubredditListListener = new AsyncResponse<List<String>>() {
+        @Override
+        public void processFinish(List<String> result) {
+            for (String subreddit : result)
+                mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, subreddit);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +62,28 @@ public class HomeActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showSubredditChooser();
+                if (App.redditClient.isAuthenticated()) {
+                    new MyAsyncTask<Void, Void, List<String>>(mSubredditListListener) {
+                        @Override
+                        protected List<String> doInBackground(Void... voids) {
+                            List<String> result = new ArrayList<>();
+                            if (App.redditClient.isAuthenticated()) {
+                                UserSubredditsPaginator subreddits = new UserSubredditsPaginator(App.redditClient, "subscriber");
+                                while (subreddits.hasNext()) {
+                                    Listing<net.dean.jraw.models.Subreddit> subs = subreddits.next();
+                                    for (net.dean.jraw.models.Subreddit s : subs) {
+                                        result.add(s.getDisplayName());
+                                    }
+                                }
+                            }
+                            return result;
+                        }
+                    }.execute();
+                }
+                else {
+                    Toast.makeText(HomeActivity.this, "Not authenticated", Toast.LENGTH_SHORT).show();
+                }
+                //showSubredditChooser();
             }
         });
 
@@ -59,12 +95,16 @@ public class HomeActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         mMenu = navigationView.getMenu();
-        mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "Southpark");
+        /*mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "Southpark");
         mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "Shameless");
         mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "BrooklynNineNine");
         mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "IASIP");
         mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "HTGAWM");
-        mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "lastmanonearthtv");
+        mMenu.add(R.id.subreddits, Menu.FLAG_APPEND_TO_GROUP, Menu.NONE, "lastmanonearthtv");*/
+
+
+
+
         navigationView.setNavigationItemSelectedListener(this);
 
         if (findViewById(R.id.fragment_container) != null) {
@@ -74,6 +114,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void GetDataForSubreddit(String subreddit) {
+        setProgressVisibility(true);
         new MyAsyncTask<String, Void, Subreddit>(this) {
             @Override
             protected Subreddit doInBackground(String... params) {
@@ -89,21 +130,32 @@ public class HomeActivity extends AppCompatActivity
         }.execute(subreddit);
     }
 
+    private void setProgressVisibility(boolean visible) {
+        ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress_bar);
+        progressBar.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
     public void showSubredditChooser() {
         new SubredditChooseFragment().show(getSupportFragmentManager(), "subreddit");
     }
 
     @Override
     public void processFinish(Subreddit result) {
-        mEpisodes.clear();
-        for (Season season : result.seasons) {
-            for (Episode episode : season.Episodes) {
+        setProgressVisibility(false);
+        if (result != null) {
+            mEpisodes.clear();
+            for (Season season : result.seasons) {
+                for (Episode episode : season.Episodes) {
 //                Log.d("HomeActivity.Episode", episode.getTitle() + ", " + episode.URL);
-                mEpisodes.add(episode);
+                    mEpisodes.add(episode);
+                }
             }
+            episodeFragment.refreshData();
+            setTitle("/r/" + result.getName());
         }
-        episodeFragment.refreshData();
-        setTitle("/r/" + result.getName());
+        else {
+            Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -138,10 +190,18 @@ public class HomeActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+        if (item.getItemId() == R.id.login_to_reddit) {
+            startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+            return false;
+        }
+        else if (item.getItemId() == R.id.revoke_oauth) {
+            App.redditClient.deauthenticate();
+//            new OAuthHelper(App.redditClient).revokeAccessToken();
+            return false;
+        }
         String subreddit = item.getTitle().toString();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -21,6 +21,11 @@ android {
     dataBinding {
         enabled = true
     }
+
+    packagingOptions {
+        pickFirst 'META-INF/license.txt'
+        pickFirst 'META-INF/license'
+    }
 }
 
 dependencies {
@@ -31,5 +36,6 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.android.support:support-v4:24.2.1'
     compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.github.thatJavaNerd:JRAW-Android:master-SNAPSHOT'
     testCompile 'junit:junit:4.12'
 }
